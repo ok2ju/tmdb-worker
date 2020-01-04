@@ -53,6 +53,7 @@ const Movie = mongoose.model('Movie', movieSchema)
 // }, null, true, 'Europe/Minsk')
 
 const getMovies = (page) => {
+  // TODO: use API_KEY from env variables
   let url = `${process.env.TMDB_BASE_URL}discover/movie?api_key=ab7c9fc53125a8e8d9fd23c8704f80e5&sort_by=popularity.desc`
   if (page) {
     url += `&page=${page}`
@@ -73,6 +74,8 @@ app.use(async ctx => {
     promises.push(getMovies(i))
   }
 
+  // TODO: don't use Promise.all. We should save data from at lease one request
+  // Handle errors!!!
   const res = await Promise.all(promises)
   const movies = collectMovies(res)
   Movie.create(movies, (err) => {
