@@ -61,6 +61,10 @@ const getMovies = (page) => {
   return axios.get(url)
 }
 
+const collectMovies = (results) => {
+  return results.reduce((res, curr) => [...res, ...curr.data.results], [])
+}
+
 app.use(async ctx => {
   const { data } = await getMovies()
   const promises = []
@@ -69,24 +73,14 @@ app.use(async ctx => {
     promises.push(getMovies(i))
   }
 
-  console.log(promises)
-
   const res = await Promise.all(promises)
-  console.log(res)
+  const movies = collectMovies(res)
+  Movie.create(movies, (err) => {
+    if (err) console.log('error', err)
+    console.log('saved')
+  })
 
   ctx.body = 'Hello world'
-
-
-  // axios
-  //   .get('https://api.themoviedb.org/3/discover/movie?api_key=ab7c9fc53125a8e8d9fd23c8704f80e5&sort_by=popularity.desc')
-  //   .then((response) => {
-  //     const { data } = response
-  //     Movie.create(data.results, (err) => {
-  //       if (err) console.log('error', err)
-  //       console.log('saved')
-  //     })
-  //     ctx.body = 'Hello world'
-  //   })
 })
 
 app.listen(process.env.APP_PORT)
