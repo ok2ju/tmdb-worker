@@ -52,17 +52,41 @@ const Movie = mongoose.model('Movie', movieSchema)
 //   console.log('You will see this message every second');
 // }, null, true, 'Europe/Minsk')
 
+const getMovies = (page) => {
+  let url = `${process.env.TMDB_BASE_URL}discover/movie?api_key=ab7c9fc53125a8e8d9fd23c8704f80e5&sort_by=popularity.desc`
+  if (page) {
+    url += `&page=${page}`
+  }
+
+  return axios.get(url)
+}
+
 app.use(async ctx => {
-  axios
-    .get('https://api.themoviedb.org/3/discover/movie?api_key=ab7c9fc53125a8e8d9fd23c8704f80e5&sort_by=popularity.desc')
-    .then((response) => {
-      const { data } = response
-      Movie.create(data.results, (err) => {
-        if (err) console.log('error', err)
-        console.log('saved')
-      })
-      ctx.body = 'Hello world'
-    })
+  const { data } = await getMovies()
+  const promises = []
+
+  for (let i = data.page; i <= data.total_pages; i++) {
+    promises.push(getMovies(i))
+  }
+
+  console.log(promises)
+
+  const res = await Promise.all(promises)
+  console.log(res)
+
+  ctx.body = 'Hello world'
+
+
+  // axios
+  //   .get('https://api.themoviedb.org/3/discover/movie?api_key=ab7c9fc53125a8e8d9fd23c8704f80e5&sort_by=popularity.desc')
+  //   .then((response) => {
+  //     const { data } = response
+  //     Movie.create(data.results, (err) => {
+  //       if (err) console.log('error', err)
+  //       console.log('saved')
+  //     })
+  //     ctx.body = 'Hello world'
+  //   })
 })
 
 app.listen(process.env.APP_PORT)
