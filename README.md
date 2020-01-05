@@ -32,10 +32,12 @@ yarn start
 ## TODOs
 1. Error handling;
 2. Loggin;
-3. Docker image;
+3. ~~Docker image;~~
 4. TravisCI;
-5. update README;
-6. Move logic into DB connection callback!
+5. ~~update README;~~
+6. ~~Move logic into DB connection callback;~~
+7. Code linting (standard);
+8. Move code into separate files.
 
 ## !
 ```sh
