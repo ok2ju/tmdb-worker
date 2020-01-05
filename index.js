@@ -10,7 +10,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const AxiosInstance = axios.create({
-  baseURL: `${process.env.TMDB_BASE_URL}`
+  baseURL: process.env.TMDB_BASE_URL
 })
 
 AxiosInstance.interceptors.response.use(
@@ -21,15 +21,6 @@ AxiosInstance.interceptors.response.use(
 mongoose.connect(process.env.DB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
-})
-
-const db = mongoose.connection
-db.on('error', (error) => {
-  console.error('connection error:', error)
-})
-
-db.once('open', () => {
-  console.log('MongoDB connection established')
 })
 
 const movieSchema = new mongoose.Schema({
@@ -100,11 +91,20 @@ const populateDB = async () => {
   }
 }
 
-// Run job every 30 minutes
-// new CronJob('0 */30 * * * *', () => {
-new CronJob('0 */01 * * * *', () => {
-  console.log('Job started at', new Date())
-  populateDB()
-}, null, true, 'Europe/Minsk')
+const db = mongoose.connection
+db.on('error', (error) => {
+  console.error('connection error:', error)
+})
+
+db.once('open', () => {
+  console.log('MongoDB connection established')
+
+  // Run job every 30 minutes
+  // new CronJob('0 */30 * * * *', () => {
+  new CronJob('0 */01 * * * *', () => {
+    console.log('Job started at', new Date())
+    populateDB()
+  }, null, true, 'Europe/Minsk')
+})
 
 server.listen(process.env.APP_PORT)
