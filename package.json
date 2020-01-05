@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +13,9 @@
     "axios": "^0.19.0",
     "cron": "^1.7.2",
     "dotenv": "^8.2.0",
-    "koa": "^2.11.0",
     "mongoose": "^5.8.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
   }
 }
