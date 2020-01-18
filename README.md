@@ -29,6 +29,11 @@ Start service:
 yarn start
 ```
 
+Start service as docker container:
+```sh
+make run-worker -e TMDB_API_KEY=yourapikey
+```
+
 ## TODOs
 1. Error handling;
 2. Loggin;
@@ -37,7 +42,7 @@ yarn start
 5. ~~update README;~~
 6. ~~Move logic into DB connection callback;~~
 7. Code linting (standard);
-8. Move code into separate files.
+8. ~~Move code into separate files.~~
 
 ## !
 ```sh

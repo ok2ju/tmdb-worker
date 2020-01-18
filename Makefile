@@ -20,7 +20,7 @@ image-publish:
 
 run-worker:
 	@ echo "---> Running Docker container ..."
-	@ docker run -it -p 3000:3000 -d --rm --link mongodb:db --name $(MODULE_NAME) $(IMAGE_URI)/$(MODULE_NAME):$(IMAGE_VERSION)
+	@ docker run -e TMDB_API_KEY=$(TMDB_API_KEY) -it -p 3000:3000 -d --rm --link mongodb:db --name $(MODULE_NAME) $(IMAGE_URI)/$(MODULE_NAME):$(IMAGE_VERSION)
 .PHONY: run-worker
 
 stop-worker:
@@ -37,3 +37,7 @@ stop-mongo:
 	@ echo "---> Stopping MongoDB container ..."
 	@ docker stop mongodb
 .PHONY: stop-mongo
+
+test:
+	@ echo "---> $(TMDB_API_KEY)"
+.PHONY: test

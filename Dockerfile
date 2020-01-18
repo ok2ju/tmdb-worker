@@ -9,8 +9,9 @@ WORKDIR $SRC_DIR
 ENV APP_PORT=3000 \
     DB_URI=mongodb://db:27017 \
     TMDB_BASE_URL=https://api.themoviedb.org/3/ \
-    TMDB_API_KEY=
+    TMDB_API_KEY= \
+    NODE_ENV=production
 
-CMD ["npm", "start"]
+CMD ["node", "./src/server.js"]
 
 EXPOSE 3000

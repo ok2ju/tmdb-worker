@@ -1,73 +1,24 @@
 const http = require('http')
 const mongoose = require('mongoose')
 const { CronJob } = require('cron')
-const axios = require('axios')
-
-const server = http.createServer()
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
-const AxiosInstance = axios.create({
-  baseURL: process.env.TMDB_BASE_URL
-})
+const { Movie } = require('./models')
+const { requestMovies } = require('./api')
+const { delay } = require('./utils')
 
-AxiosInstance.interceptors.response.use(
-  response => response.data,
-  error => Promise.reject(error)
-)
+const server = http.createServer()
 
 mongoose.connect(process.env.DB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
 
-const movieSchema = new mongoose.Schema({
-  adult: Boolean,
-  backdrop_path: String,
-  budget: Number,
-  genres: Array,
-  homepage: String,
-  id: Number,
-  imdb_id: String,
-  original_language: String,
-  original_title: String,
-  overview: String,
-  popularity: Number,
-  poster_path: String,
-  production_companies: Array,
-  production_countries: Array,
-  release_date: String,
-  revenue: Number,
-  runtime: Number,
-  spoken_languages: Array,
-  status: String,
-  tagline: String,
-  title: String,
-  video: Boolean,
-  vote_average: Number,
-  vote_count: Number
-})
-
-const Movie = mongoose.model('Movie', movieSchema)
-
-const requestMovies = (page) => (
-  AxiosInstance.get('/discover/movie', {
-    params: {
-      api_key: process.env.TMDB_API_KEY,
-      sort_by: 'popularity.desc',
-      page
-    }
-  })
-)
-
 const collectMovies = (results) => (
   results.reduce((res, curr) => [...res, ...curr.results], [])
-)
-
-const delay = (ms) => (
-  new Promise(resolve => setTimeout(resolve, ms))
 )
 
 const populateDB = async () => {
@@ -82,9 +33,14 @@ const populateDB = async () => {
 
     const res = await Promise.all(promises)
     const movies = collectMovies(res)
-    Movie.create(movies, (err) => {
-      if (err) console.log('error', err)
-      console.log('saved')
+
+    movies.forEach(async (movie) => {
+      const targetMovie = await Movie.findOne({ id: movie.id })
+      if (targetMovie) {
+        Movie.replaceOne({ id: movie.id }, movie)
+      } else {
+        Movie.create(movie)
+      }
     })
   } catch (error) {
     console.log('Populate DB error', error)
